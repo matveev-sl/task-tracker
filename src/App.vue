@@ -1,13 +1,14 @@
 <template>
   <div class="board">
-    <TaskColumn
-      v-for="column in columns"
-      :key="column.id"
-      :title="column.title"
-      :tasks="column.tasks"
-      @update-tasks="updateTasks(column.id, $event)"
-      @add-task="addTask(column.id, $event)"
-    />
+  <TaskColumn
+  v-for="column in columns"
+  :key="column.id"
+  :title="column.title"
+  :tasks="column.tasks"
+  :column-id="column.id"
+  @update-tasks="updateTasks"
+  @add-task="addTask(column.id, $event)"
+/>
   </div>
 </template>
 
@@ -65,13 +66,13 @@ export default {
     };
   },
   methods: {
-    updateTasks(columnId, updatedTasks) {
-      this.columns = this.columns.map(column => {
-        if (column.id === columnId) {
-          return { ...column, tasks: updatedTasks };
-        }
-        return column;
-      });
+    updateTasks({ columnId, tasks }) {
+    this.columns = this.columns.map(column => {
+      if (column.id === columnId) {
+        return { ...column, tasks };
+      }
+      return column;
+    });
     },
     addTask(columnId, newTask) {
       this.columns = this.columns.map(column => {

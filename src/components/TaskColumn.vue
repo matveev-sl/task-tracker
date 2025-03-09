@@ -1,12 +1,12 @@
 <template>
     <div class="task-column">
       <h2>{{ title }}</h2>
-      <draggable 
-        v-model="tasksProxy" 
-        :group="{ name: 'tasks', pull: true, put: true }" 
+      <draggable
+        v-model="localTasks"
+        :group="{ name: 'tasks', pull: true, put: true }"
         @end="onDragEnd"
       >
-        <div v-for="task in tasksProxy" :key="task.id" class="task">
+        <div v-for="task in localTasks" :key="task.id" class="task">
           <p>{{ task.text }}</p>
         </div>
       </draggable>
@@ -38,23 +38,19 @@
     },
     data() {
       return {
-        isAddingTask: false, 
+        localTasks: [...this.tasks], // Локальная копия массива задач
+        isAddingTask: false,
         newTaskText: '',
       };
     },
-    computed: {
-      tasksProxy: {
-        get() {
-          return this.tasks;
-        },
-        set(newTasks) {
-          this.$emit('update:tasks', newTasks);
-        },
+    watch: {
+      tasks(newTasks) {
+        this.localTasks = [...newTasks];
       },
     },
     methods: {
       onDragEnd() {
-        this.$emit('update:tasks', this.tasksProxy);
+        this.$emit('update-tasks', this.localTasks);
       },
       submitTask() {
         if (!this.newTaskText.trim()) return;
@@ -64,9 +60,10 @@
           text: this.newTaskText,
         };
   
-        this.tasksProxy.push(newTask);
+        this.localTasks.push(newTask);
         this.newTaskText = '';
         this.isAddingTask = false;
+        this.$emit('update-tasks', this.localTasks);
       },
       cancelAdding() {
         this.isAddingTask = false;
@@ -76,7 +73,7 @@
   };
   </script>
   
-  <style lang="scss" scoped>
+  <style scoped>
   .task-column {
     background: white;
     padding: 15px;
@@ -91,4 +88,4 @@
     gap: 5px;
   }
   </style>
-        
+  
